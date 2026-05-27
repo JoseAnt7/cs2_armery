@@ -53,8 +53,28 @@ services:
       - backend
     ports:
       - "${HTTP_PORT:-8081}:80"
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-proxy
+      - traefik.http.routers.skinatlas.rule=Host(`${TRAEFIK_DOMAIN:-skinatlas.es}`) || Host(`www.${TRAEFIK_DOMAIN:-skinatlas.es}`)
+      - traefik.http.routers.skinatlas.entrypoints=websecure
+      - traefik.http.routers.skinatlas.tls=true
+      - traefik.http.routers.skinatlas.tls.certresolver=letsencrypt
+      - traefik.http.routers.skinatlas.service=skinatlas
+      - traefik.http.routers.skinatlas-http.rule=Host(`${TRAEFIK_DOMAIN:-skinatlas.es}`) || Host(`www.${TRAEFIK_DOMAIN:-skinatlas.es}`)
+      - traefik.http.routers.skinatlas-http.entrypoints=web
+      - traefik.http.routers.skinatlas-http.middlewares=skinatlas-redirect-https
+      - traefik.http.middlewares.skinatlas-redirect-https.redirectscheme.scheme=https
+      - traefik.http.services.skinatlas.loadbalancer.server.port=80
+    networks:
+      - default
+      - traefik-proxy
     restart: unless-stopped
 
 volumes:
   mysql_data:
   backend_data:
+
+networks:
+  traefik-proxy:
+    external: true

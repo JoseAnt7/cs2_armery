@@ -106,12 +106,52 @@ Se dispara con push a `main` o `docker`.
 
 ---
 
-## 6) HTTPS y dominio
+## 6) Dominio `skinatlas.es` + Traefik (Hostinger)
 
-Opciones habituales:
+### DNS (ya configurado en tu panel)
 
-- Nginx en el **host** que escuche en 443 y haga proxy a `127.0.0.1:8081`.
-- Cloudflare delante del VPS.
+| Tipo | Nombre | Valor |
+|------|--------|--------|
+| A | `@` | IP del VPS (ej. `76.12.150.55`) |
+| CNAME | `www` | `skinatlas.es` |
+
+Comprueba propagación (mejor que `ping`, el VPS suele bloquear ICMP):
+
+```bash
+nslookup skinatlas.es
+```
+
+### Traefik
+
+1. En **Administrador de Docker** → **Implementar Traefik** (proyecto en marcha en puertos 80/443).
+2. El `docker-compose.yml` de este repo ya incluye **labels Traefik** en `frontend` y la red externa `traefik-proxy`.
+3. Requisito extra respecto al ejemplo mínimo de Kodee:
+   - `networks: traefik-proxy` (sin esto Traefik no alcanza el contenedor).
+   - `traefik.docker.network=traefik-proxy`
+   - `tls.certresolver=letsencrypt` (certificado HTTPS automático).
+   - Router HTTP aparte que redirige a HTTPS.
+
+Redeploy en el VPS:
+
+```bash
+cd /ruta/al/repo
+git pull
+docker compose up -d --build
+```
+
+Prueba:
+
+- `https://skinatlas.es`
+- `https://www.skinatlas.es`
+- Respaldo directo: `http://IP_VPS:8081`
+
+El puerto **8081** sigue publicado por si quieres depurar; en producción el tráfico web entra por Traefik (80/443).
+
+### Si HTTPS no arranca
+
+- DNS debe resolver a la IP del VPS **antes** de pedir el certificado.
+- Traefik desplegado y la red `traefik-proxy` existe: `docker network ls | grep traefik`.
+- Logs: `docker logs traefik` (o el nombre del contenedor Traefik en tu VPS).
 
 ---
 
