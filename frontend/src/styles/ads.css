@@ -1,0 +1,77 @@
+/* Layout home con laterales para publicidad */
+@media (min-width: 1200px) {
+  .main-content:has(.home-page) {
+    max-width: 1540px;
+  }
+}
+
+.home-page {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.home-page__content {
+  min-width: 0;
+}
+
+.home-page__ads {
+  display: none;
+  flex-direction: column;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+@media (min-width: 1200px) {
+  .home-page {
+    grid-template-columns: 160px minmax(0, 1fr) 160px;
+    align-items: start;
+  }
+
+  .home-page__ads {
+    display: flex;
+    position: sticky;
+    top: 5.5rem;
+  }
+}
+
+/* Marcadores AdSense / publicidad */
+.ad-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+  max-width: 160px;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-muted);
+  text-align: center;
+  overflow: hidden;
+}
+
+.ad-slot--medium {
+  min-height: 250px;
+  aspect-ratio: 6 / 5;
+}
+
+.ad-slot--tall {
+  min-height: 600px;
+  max-height: calc(100vh - 8rem);
+}
+
+.ad-slot__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.ad-slot__size {
+  font-size: 0.65rem;
+  opacity: 0.45;
+}

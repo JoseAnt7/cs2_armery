@@ -1,0 +1,85 @@
+.rarity-select {
+  position: relative;
+  width: 100%;
+}
+
+.rarity-select__trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rarity-select__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rarity-select__chevron {
+  opacity: 0.55;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.rarity-select__swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.rarity-select__swatch--empty {
+  background: transparent;
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: none;
+}
+
+.rarity-select__menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 200;
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+}
+
+.rarity-select__option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.55rem;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rarity-select__option:hover,
+.rarity-select__option--active {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.rarity-select--disabled .rarity-select__trigger {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
