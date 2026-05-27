@@ -1,0 +1,60 @@
+# SkinAtlas — despliegue VPS (Hostinger)
+# Puertos host: frontend 8081 (VibeUp/Agentes suele usar 80). MySQL solo red interna Docker.
+
+name: skinatlas
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: skinatlas-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-skinatlas}
+      MYSQL_USER: ${MYSQL_USER:-skinatlas}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-change_mysql_password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change_root_password}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$${MYSQL_ROOT_PASSWORD}\" mysqladmin ping -h localhost -uroot --silent"]
+      start_period: 40s
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: skinatlas-backend
+    env_file:
+      - ./backend/.env
+    environment:
+      PORT: 5000
+      PYTHONUNBUFFERED: 1
+      DATABASE_URL: mysql+pymysql://${MYSQL_USER:-skinatlas}:${MYSQL_PASSWORD:-change_mysql_password}@mysql:3306/${MYSQL_DATABASE:-skinatlas}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - backend_data:/app/data
+    expose:
+      - "5000"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE: ${VITE_API_BASE:-}
+    container_name: skinatlas-frontend
+    depends_on:
+      - backend
+    ports:
+      - "${HTTP_PORT:-8081}:80"
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  backend_data:
