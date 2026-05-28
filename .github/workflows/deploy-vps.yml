@@ -5,7 +5,7 @@ name: Deploy VPS
 
 on:
   push:
-    branches: [main, docker]
+    branches: [main-copia]
   workflow_dispatch:
 
 jobs:
