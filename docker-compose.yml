@@ -1,5 +1,5 @@
 # SkinAtlas — despliegue VPS (Hostinger)
-# Puertos host: frontend 8081 (VibeUp/Agentes suele usar 80). MySQL solo red interna Docker.
+# Dominio: Traefik (80/443). Acceso directo: http://IP:8081
 
 name: skinatlas
 
@@ -51,6 +51,13 @@ services:
     ports:
       - "${HTTP_PORT:-8081}:80"
     restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.skinatlas.rule=Host(`skinatlas.es`) || Host(`www.skinatlas.es`)
+      - traefik.http.routers.skinatlas.entrypoints=web,websecure
+      - traefik.http.routers.skinatlas.tls=true
+      - traefik.http.routers.skinatlas.tls.certresolver=letsencrypt
+      - traefik.http.services.skinatlas.loadbalancer.server.port=80
 
 volumes:
   mysql_data:
