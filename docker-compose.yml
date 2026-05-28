@@ -6,7 +6,6 @@ name: skinatlas
 services:
   mysql:
     image: mysql:8.4
-    container_name: skinatlas-mysql
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-skinatlas}
@@ -26,7 +25,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: skinatlas-backend
     env_file:
       - ./backend/.env
     environment:
@@ -48,7 +46,6 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_API_BASE: ${VITE_API_BASE:-}
-    container_name: skinatlas-frontend
     depends_on:
       - backend
     ports:
