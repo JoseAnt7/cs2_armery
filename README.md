@@ -19,23 +19,7 @@ Los precios son **reales** cuando la API responde. Steam aplica rate limits; el 
 - Python 3.10+
 - Node.js 18+
 
-## Despliegue en VPS (Docker / Hostinger)
-
-Configuración igual que el proyecto **Agentes/VibeUp**, con puertos distintos para convivir en el mismo VPS:
-
-- **Web:** puerto `8081` (VibeUp suele usar `80`)
-- Contenedores: `skinatlas-mysql`, `skinatlas-backend`, `skinatlas-frontend`
-
-```bash
-cp .env.example .env
-cp backend/.env.example backend/.env
-# Edita credenciales y JWT_SECRET_KEY
-docker compose up -d --build
-```
-
-Guía completa: [DEPLOY_HOSTINGER_DOCKER.md](./DEPLOY_HOSTINGER_DOCKER.md)
-
-## Arranque rápido (desarrollo local)
+## Arranque rápido
 
 ### Backend (Flask)
 
