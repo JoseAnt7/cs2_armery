@@ -394,7 +394,7 @@ export function Admin() {
                     <td data-label="Email">{u.email}</td>
                     <td data-label="Rol">
                       <span className={u.is_admin ? 'admin-badge admin-badge--gold' : 'admin-badge'}>
-                        {u.is_admin ? 'Admin' : 'Usuario'}
+                        {u.is_admin ? (u.admin_protected ? 'Admin principal' : 'Admin') : 'Usuario'}
                       </span>
                     </td>
                     <td data-label="Suscripciones">
@@ -460,6 +460,12 @@ export function Admin() {
                         type="button"
                         className="admin-btn admin-btn--outline"
                         onClick={() => toggleAdmin(u)}
+                        disabled={u.admin_protected && u.is_admin}
+                        title={
+                          u.admin_protected && u.is_admin
+                            ? 'El administrador principal (ID 1) no puede perder el rol admin'
+                            : undefined
+                        }
                       >
                         {u.is_admin ? 'Quitar admin' : 'Hacer admin'}
                       </button>

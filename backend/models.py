@@ -2,6 +2,9 @@ from extensions import db
 from datetime import datetime
 import json
 
+# Primer administrador: no se puede quitar el rol admin vía panel (ID fijo).
+PRIMARY_ADMIN_USER_ID = 1
+
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -19,6 +22,9 @@ class User(db.Model):
         cascade='all, delete-orphan',
     )
 
+    def is_primary_admin(self):
+        return self.id == PRIMARY_ADMIN_USER_ID
+
     def to_dict(self, include_admin=False):
         data = {
             'id': self.id,
@@ -28,6 +34,7 @@ class User(db.Model):
         }
         if include_admin:
             data['is_admin'] = bool(getattr(self, 'is_admin', False))
+            data['admin_protected'] = self.is_primary_admin()
         return data
 
 
