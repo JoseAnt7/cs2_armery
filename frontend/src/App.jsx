@@ -19,6 +19,7 @@ import { Terms } from './Pages/legal/Terms';
 import { Contact } from './Pages/legal/Contact';
 import { VisitTracker } from './components/VisitTracker';
 import { CookieConsent } from './components/CookieConsent';
+import { SeoRouteWatcher } from './components/Seo';
 import './styles/layout.css';
 import './styles/mobile.css';
 import './styles/legal.css';
@@ -48,6 +49,7 @@ function SubscriptionsGate({ children }) {
 function App() {
   return (
     <BrowserRouter>
+      <SeoRouteWatcher />
       <VisitTracker />
       <CSBotProvider>
         <SiteConfigProvider>

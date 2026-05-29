@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { fetchWeaponDetail } from '../api/client';
 import { PriceOffers } from '../components/PriceOffers';
+import { Seo } from '../components/Seo';
 import '../styles/detail.css';
 
 function formatPrice(usd) {
@@ -49,9 +50,29 @@ export function WeaponDetail() {
   }
 
   const { weapon, pricing } = data;
+  const priceHint =
+    pricing?.average_price_usd != null
+      ? ` Precio medio aproximado: ${formatPrice(pricing.average_price_usd)}.`
+      : '';
+  const seoDescription = `Compara precios de ${weapon.display_name} en CS2: ofertas en Steam, Skinport, DMarket y más mercados.${priceHint}`;
+
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: weapon.display_name,
+    description: seoDescription,
+    image: weapon.image || undefined,
+    category: weapon.category_label,
+  };
 
   return (
     <>
+      <Seo
+        title={`${weapon.display_name} — precio CS2`}
+        description={seoDescription}
+        canonicalPath={`/arma/${id}`}
+        jsonLdExtra={productJsonLd}
+      />
       <Link to="/" className="back-link">
         ← Volver al catálogo
       </Link>

@@ -1,0 +1,9 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /cuenta
+Disallow: /profile
+
+Sitemap: https://skinatlas.es/sitemap.xml
