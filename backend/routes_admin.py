@@ -133,6 +133,10 @@ def admin_update_user(user_id):
         target_admin = bool(data["is_admin"])
         if user.id == actor.id and not target_admin:
             return jsonify({"msg": "No puedes quitarte el rol admin a ti mismo"}), 400
+        if not target_admin and user.is_primary_admin():
+            return jsonify({
+                "msg": "No se puede quitar el rol admin al administrador principal (ID 1)",
+            }), 400
         user.is_admin = target_admin
 
     if "email" in data and data["email"]:
