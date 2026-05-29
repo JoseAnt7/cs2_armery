@@ -1,4 +1,4 @@
-# SEO — SkinAtlas
+# SEO — Global Skin Metrics
 
 ## Qué está implementado en el código
 
@@ -15,14 +15,14 @@ Tras `npm run build`, `robots.txt` y `sitemap.xml` se copian a `dist/` y Nginx l
 1. **Dominio nuevo**: Google tarda días o semanas en rastrear e indexar.
 2. **SPA (React)**: Google renderiza JavaScript, pero tarda más que HTML estático. Las fichas `/arma/...` se descubren por enlaces internos del catálogo.
 3. **Falta registrar el sitio** en [Google Search Console](https://search.google.com/search-console).
-4. **Sin enlaces externos** hacia `skinatlas.es` el posicionamiento es más lento.
+4. **Sin enlaces externos** hacia `globalskinmetrics.com` el posicionamiento es más lento.
 
 ## Pasos recomendados (fuera del código)
 
 1. **Google Search Console**
-   - Añadir propiedad `https://skinatlas.es`
+   - Añadir propiedad `https://globalskinmetrics.com`
    - Verificar dominio (DNS TXT o archivo HTML)
-   - Enviar sitemap: `https://skinatlas.es/sitemap.xml`
+   - Enviar sitemap: `https://globalskinmetrics.com/sitemap.xml`
    - Solicitar indexación de la home
 
 2. **Contenido**
@@ -40,11 +40,11 @@ Tras `npm run build`, `robots.txt` y `sitemap.xml` se copian a `dist/` y Nginx l
 
 - Sitemap dinámico con todas las URLs `/arma/{id}` (script en backend).
 - Pre-render (SSR) o prerender estático para fichas más indexables.
-- Imagen `og:image` dedicada (1200×630) en `/public/og-skinatlas.jpg`.
+- Imagen `og:image` dedicada (1200×630) en `/public/og-global-skin-metrics.jpg`.
 - Blog o guías (“cómo comprar skins CS2”) para más palabras clave.
 
 ## Comprobar meta en producción
 
-- Ver código fuente inicial: `curl -s https://skinatlas.es/ | head -40`
+- Ver código fuente inicial: `curl -s https://globalskinmetrics.com/ | head -40`
 - Rich Results Test: https://search.google.com/test/rich-results
 - Inspección de URL en Search Console

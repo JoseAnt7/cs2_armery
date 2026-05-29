@@ -1,5 +1,5 @@
-# SkinAtlas — despliegue VPS (Hostinger)
-# Dominio: Traefik (80/443). Acceso directo: http://IP:8081
+# Global Skin Metrics — despliegue VPS (Hostinger)
+# Dominio: globalskinmetrics.com (Traefik 80/443). Acceso directo: http://IP:8081
 
 name: skinatlas
 
@@ -53,11 +53,11 @@ services:
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.skinatlas.rule=Host(`skinatlas.es`) || Host(`www.skinatlas.es`)
-      - traefik.http.routers.skinatlas.entrypoints=web,websecure
-      - traefik.http.routers.skinatlas.tls=true
-      - traefik.http.routers.skinatlas.tls.certresolver=letsencrypt
-      - traefik.http.services.skinatlas.loadbalancer.server.port=80
+      - traefik.http.routers.gsm.rule=Host(`globalskinmetrics.com`) || Host(`www.globalskinmetrics.com`)
+      - traefik.http.routers.gsm.entrypoints=web,websecure
+      - traefik.http.routers.gsm.tls=true
+      - traefik.http.routers.gsm.tls.certresolver=letsencrypt
+      - traefik.http.services.gsm.loadbalancer.server.port=80
 
 volumes:
   mysql_data:

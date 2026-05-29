@@ -1,1 +1,1 @@
-# Servicios de precios y catálogo de SkinAtlas
+# Servicios de precios y catálogo de Global Skin Metrics

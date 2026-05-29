@@ -63,4 +63,4 @@ def weapon_detail(weapon_id):
 
 @weapons_bp.route("/api/health", methods=["GET"])
 def health():
-    return jsonify({"status": "ok", "app": "Skin Atlas"})
+    return jsonify({"status": "ok", "app": "Global Skin Metrics"})
