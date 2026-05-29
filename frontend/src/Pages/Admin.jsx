@@ -456,19 +456,15 @@ export function Admin() {
                       </div>
                     </td>
                     <td data-label="Acciones">
-                      <button
-                        type="button"
-                        className="admin-btn admin-btn--outline"
-                        onClick={() => toggleAdmin(u)}
-                        disabled={u.admin_protected && u.is_admin}
-                        title={
-                          u.admin_protected && u.is_admin
-                            ? 'El administrador principal (ID 1) no puede perder el rol admin'
-                            : undefined
-                        }
-                      >
-                        {u.is_admin ? 'Quitar admin' : 'Hacer admin'}
-                      </button>
+                      {!(u.admin_protected && u.is_admin) && (
+                        <button
+                          type="button"
+                          className="admin-btn admin-btn--outline"
+                          onClick={() => toggleAdmin(u)}
+                        >
+                          {u.is_admin ? 'Quitar admin' : 'Hacer admin'}
+                        </button>
+                      )}
                     </td>
                   </tr>
                 );
