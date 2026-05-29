@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { fetchSubscriptionDetail, subscribeToPlan } from '../api/client';
-import { AdSlot } from '../components/AdSlot';
 import '../styles/subscriptions.css';
 import '../styles/catalog.css';
-import '../styles/ads.css';
 
 function formatPrice(eur) {
   return new Intl.NumberFormat('es-ES', {
@@ -83,13 +81,7 @@ export function SubscriptionDetail() {
   }
 
   return (
-    <div className="home-page">
-      <aside className="home-page__ads home-page__ads--left">
-        <AdSlot slot={`subdetail-left-${slug}`} size="medium" />
-        <AdSlot slot={`subdetail-left2-${slug}`} size="tall" />
-      </aside>
-
-      <div className="home-page__content">
+    <>
       <Link to="/suscripciones" className="back-link">
         ← Volver a suscripciones
       </Link>
@@ -155,12 +147,6 @@ export function SubscriptionDetail() {
           </div>
         </section>
       )}
-      </div>
-
-      <aside className="home-page__ads home-page__ads--right">
-        <AdSlot slot={`subdetail-right-${slug}`} size="medium" />
-        <AdSlot slot={`subdetail-right2-${slug}`} size="tall" />
-      </aside>
-    </div>
+    </>
   );
 }

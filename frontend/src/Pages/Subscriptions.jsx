@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
 import { fetchSubscriptions } from '../api/client';
-import { AdSlot } from '../components/AdSlot';
 import { SubscriptionCard } from '../components/SubscriptionCard';
 import '../styles/catalog.css';
 import '../styles/subscriptions.css';
-import '../styles/ads.css';
 
 export function Subscriptions() {
   const [items, setItems] = useState([]);
@@ -19,13 +17,7 @@ export function Subscriptions() {
   }, []);
 
   return (
-    <div className="home-page">
-      <aside className="home-page__ads home-page__ads--left">
-        <AdSlot slot="subs-left-top" size="medium" />
-        <AdSlot slot="subs-left-bottom" size="tall" />
-      </aside>
-
-      <div className="home-page__content">
+    <>
       <section className="hero">
         <h1 className="hero__title">
           Suscripciones <span>Global Skin Metrics</span>
@@ -61,12 +53,6 @@ export function Subscriptions() {
           ))}
         </div>
       )}
-      </div>
-
-      <aside className="home-page__ads home-page__ads--right">
-        <AdSlot slot="subs-right-top" size="medium" />
-        <AdSlot slot="subs-right-bottom" size="tall" />
-      </aside>
-    </div>
+    </>
   );
 }

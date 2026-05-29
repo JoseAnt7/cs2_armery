@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { fetchCategories, fetchWeaponFilters, fetchWeapons } from '../api/client';
-import { AdSlot } from '../components/AdSlot';
 import { FilterBar } from '../components/FilterBar';
 import { WeaponCard } from '../components/WeaponCard';
 import '../styles/catalog.css';
-import '../styles/ads.css';
 
 const DEFAULT_CATEGORIES = [{ id: 'all', label: 'Todas' }];
 
@@ -73,13 +71,7 @@ export function Home() {
   }, [loadWeapons]);
 
   return (
-    <div className="home-page">
-      <aside className="home-page__ads home-page__ads--left">
-        <AdSlot slot="home-left-top" size="medium" />
-        <AdSlot slot="home-left-bottom" size="tall" />
-      </aside>
-
-      <div className="home-page__content">
+    <>
       <section className="hero">
         <h1 className="hero__title">
           Compara precios de <span>skins CS2</span>
@@ -165,12 +157,6 @@ export function Home() {
           </nav>
         </>
       )}
-      </div>
-
-      <aside className="home-page__ads home-page__ads--right">
-        <AdSlot slot="home-right-top" size="medium" />
-        <AdSlot slot="home-right-bottom" size="tall" />
-      </aside>
-    </div>
+    </>
   );
 }
