@@ -9,10 +9,10 @@ export const LEGAL = {
 
   titulares: [
     { name: 'José Antonio Llorens Padilla', nif: '74013038G' },
-    { name: 'Raúl Reolid Más', nif: null }, // Completar cuando se disponga del NIF
+    { name: 'Raúl Reolid Más', nif: '46087787L' },
   ],
 
-  address: 'Calle Sentenero, 23, España',
+  address: 'Calle Sentenero, 23, 03660 Novelda, Alicante, España',
 
   emails: {
     public: 'jllorenspadilla@gmail.com',
