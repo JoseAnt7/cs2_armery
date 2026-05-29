@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash
 from sqlalchemy import func
 
 from extensions import db
-from models import User, UserSubscription, Subscription, SubscriptionPlan, PageVisit
+from models import User, UserSubscription, Subscription, SubscriptionPlan, PageVisit, SiteSettings
 
 admin_bp = Blueprint("admin", __name__)
 
@@ -262,3 +262,29 @@ def admin_bootstrap():
         "user": user.to_dict(include_admin=True),
         "access_token": access_token,
     }), 201
+
+
+@admin_bp.route("/api/admin/settings", methods=["GET"])
+@jwt_required()
+def admin_get_settings():
+    if not _get_admin_user():
+        return jsonify({"msg": "No autorizado"}), 403
+
+    row = SiteSettings.get_singleton()
+    return jsonify({"settings": row.to_public_dict()})
+
+
+@admin_bp.route("/api/admin/settings", methods=["PATCH"])
+@jwt_required()
+def admin_patch_settings():
+    if not _get_admin_user():
+        return jsonify({"msg": "No autorizado"}), 403
+
+    data = request.get_json() or {}
+    row = SiteSettings.get_singleton()
+
+    if "hide_subscriptions_public" in data:
+        row.hide_subscriptions_public = bool(data["hide_subscriptions_public"])
+
+    db.session.commit()
+    return jsonify({"settings": row.to_public_dict()})

@@ -1,14 +1,26 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import {
   adminCreateUser,
+  adminPatchSettings,
   adminPatchUser,
   adminSetUserSubscription,
   fetchAdminStats,
+  fetchAdminSettings,
   fetchAdminUsers,
   fetchSubscriptions,
 } from '../api/client';
+import { useSiteConfig } from '../context/SiteConfigContext';
 import '../styles/admin.css';
+
+const PUBLIC_PAGES = [
+  {
+    id: 'subscriptions',
+    label: 'Suscripciones',
+    path: '/suscripciones',
+    settingKey: 'hide_subscriptions_public',
+  },
+];
 
 function getToken() {
   return localStorage.getItem('access_token');
@@ -24,12 +36,17 @@ function getStoredUser() {
 }
 
 export function Admin() {
+  const { refresh: refreshSiteConfig } = useSiteConfig();
   const token = getToken();
-  const storedUser = getStoredUser();
   const [forbidden, setForbidden] = useState(false);
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [subsCatalog, setSubsCatalog] = useState([]);
+  const [siteSettings, setSiteSettings] = useState(null);
+  const [draftHideSubs, setDraftHideSubs] = useState(false);
+  const [savedHideSubs, setSavedHideSubs] = useState(false);
+  const [savingVisibility, setSavingVisibility] = useState(false);
+  const [visibilityMsg, setVisibilityMsg] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [newUser, setNewUser] = useState({
@@ -54,9 +71,15 @@ export function Admin() {
         fetchAdminUsers(),
         fetchSubscriptions({ includePlans: true }),
       ]);
+      const settingsRes = await fetchAdminSettings();
       setStats(s);
       setUsers(u.items || []);
       setSubsCatalog(catalog.items || []);
+      const settings = settingsRes.settings || null;
+      setSiteSettings(settings);
+      const hideSubs = Boolean(settings?.hide_subscriptions_public);
+      setDraftHideSubs(hideSubs);
+      setSavedHideSubs(hideSubs);
       setForbidden(false);
     } catch (err) {
       const msg = String(err.message || '');
@@ -159,18 +182,28 @@ export function Admin() {
   }
 
   if (forbidden) {
-    return (
-      <div className="admin-page">
-        <div className="admin-forbidden">
-          <h1>Acceso restringido</h1>
-          <p>Solo pueden entrar usuarios administradores.</p>
-          {storedUser && !storedUser.is_admin && (
-            <p>Vuelve a iniciar sesión si un admin acaba de darte permisos.</p>
-          )}
-          <Link to="/">Volver al inicio</Link>
-        </div>
-      </div>
-    );
+    return <Navigate to="/" replace />;
+  }
+
+  const visibilityDirty = draftHideSubs !== savedHideSubs;
+
+  async function saveVisibility() {
+    setError('');
+    setVisibilityMsg('');
+    setSavingVisibility(true);
+    try {
+      const res = await adminPatchSettings({ hide_subscriptions_public: draftHideSubs });
+      const next = Boolean(res.settings?.hide_subscriptions_public);
+      setSiteSettings(res.settings || null);
+      setDraftHideSubs(next);
+      setSavedHideSubs(next);
+      await refreshSiteConfig();
+      setVisibilityMsg('Cambios guardados');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSavingVisibility(false);
+    }
   }
 
   return (
@@ -180,12 +213,74 @@ export function Admin() {
           <h1 className="admin-page__title">Administración</h1>
           <p className="admin-page__subtitle">Estadísticas, usuarios y suscripciones</p>
         </div>
-        <Link to="/" className="admin-back">
-          ← Catálogo
-        </Link>
       </header>
 
       {error && <p className="admin-error">{error}</p>}
+
+      <section className="admin-section">
+        <h2 className="admin-section-title">Visibilidad de páginas</h2>
+        <p className="admin-note">
+          Controla qué secciones ve el público (visitantes y usuarios no admin). Los administradores siempre las ven.
+        </p>
+        <div className="admin-table-wrap">
+          <table className="admin-table admin-visibility-table">
+            <thead>
+              <tr>
+                <th>Página</th>
+                <th>Ruta</th>
+                <th>Visible al público</th>
+              </tr>
+            </thead>
+            <tbody>
+              {PUBLIC_PAGES.map((page) => {
+                const isPublicVisible = !draftHideSubs;
+                return (
+                  <tr key={page.id}>
+                    <td data-label="Página">{page.label}</td>
+                    <td data-label="Ruta">
+                      <code>{page.path}</code>
+                    </td>
+                    <td data-label="Visible al público">
+                      <button
+                        type="button"
+                        className={`admin-visibility-toggle ${isPublicVisible ? 'admin-visibility-toggle--on' : 'admin-visibility-toggle--off'}`}
+                        onClick={() => {
+                          setVisibilityMsg('');
+                          setDraftHideSubs((prev) => !prev);
+                        }}
+                        title={isPublicVisible ? 'Visible para el público' : 'Oculta para el público'}
+                        aria-label={
+                          isPublicVisible
+                            ? 'Ocultar al público'
+                            : 'Mostrar al público'
+                        }
+                      >
+                        {isPublicVisible ? '👁' : '🚫'}
+                      </button>
+                      <span className="admin-visibility-status">
+                        {isPublicVisible ? 'Visible' : 'Oculta'}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <div className="admin-visibility-actions">
+          <button
+            type="button"
+            className="admin-btn"
+            disabled={!visibilityDirty || savingVisibility}
+            onClick={saveVisibility}
+          >
+            {savingVisibility ? 'Guardando…' : 'Guardar cambios'}
+          </button>
+          {visibilityMsg && (
+            <span className="admin-visibility-msg">{visibilityMsg}</span>
+          )}
+        </div>
+      </section>
 
       {stats && (
         <section className="admin-stats admin-section">

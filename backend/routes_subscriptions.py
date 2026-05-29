@@ -3,9 +3,13 @@ Rutas API para suscripciones y planes.
 """
 from flask import Blueprint, request, jsonify
 from datetime import datetime
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import (
+    jwt_required,
+    get_jwt_identity,
+    verify_jwt_in_request,
+)
 from extensions import db
-from models import Subscription, SubscriptionPlan, UserSubscription
+from models import Subscription, SubscriptionPlan, UserSubscription, SiteSettings, User
 
 subscriptions_bp = Blueprint('subscriptions', __name__)
 
@@ -13,9 +17,36 @@ subscriptions_bp = Blueprint('subscriptions', __name__)
 def _current_user_id():
     return int(get_jwt_identity())
 
+def _is_admin_request():
+    """
+    Determina si la request viene de un admin (JWT opcional).
+    Si no hay token o el token no es admin, devuelve False.
+    """
+    try:
+        verify_jwt_in_request(optional=True)
+        ident = get_jwt_identity()
+        if not ident:
+            return False
+        user = db.session.get(User, int(ident))
+        return bool(user and user.is_admin)
+    except Exception:
+        return False
+
+
+def _block_if_hidden_for_public():
+    row = SiteSettings.get_singleton()
+    if not row.hide_subscriptions_public:
+        return None
+    if _is_admin_request():
+        return None
+    return jsonify({'error': 'No encontrado'}), 404
+
 
 @subscriptions_bp.route('/api/subscriptions', methods=['GET'])
 def list_subscriptions():
+    blocked = _block_if_hidden_for_public()
+    if blocked:
+        return blocked
     include_plans = request.args.get('include_plans', '0') == '1'
     items = (
         Subscription.query.filter_by(is_active=True)
@@ -29,6 +60,9 @@ def list_subscriptions():
 
 @subscriptions_bp.route('/api/subscriptions/<slug>', methods=['GET'])
 def subscription_detail(slug):
+    blocked = _block_if_hidden_for_public()
+    if blocked:
+        return blocked
     sub = Subscription.query.filter_by(slug=slug, is_active=True).first()
     if not sub:
         return jsonify({'error': 'Suscripción no encontrada'}), 404

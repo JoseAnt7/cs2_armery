@@ -102,3 +102,12 @@ def delete_profile():
     db.session.delete(user)
     db.session.commit()
     return jsonify({'msg': 'Cuenta eliminada'})
+
+
+@api_bp.route('/api/public-settings', methods=['GET'])
+def public_settings():
+    """Settings públicos para que el frontend sepa qué mostrar."""
+    from models import SiteSettings
+
+    row = SiteSettings.get_singleton()
+    return jsonify(row.to_public_dict())

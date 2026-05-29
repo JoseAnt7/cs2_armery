@@ -35,6 +35,16 @@ async function authRequest(path, options = {}) {
   });
 }
 
+/** Incluye JWT si hay sesión (necesario para admins con páginas ocultas al público). */
+async function optionalAuthRequest(path, options = {}) {
+  const token = localStorage.getItem('access_token');
+  const headers = { Accept: 'application/json', ...options.headers };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return request(path, { ...options, headers });
+}
+
 export function fetchCategories() {
   return request('/weapons/categories');
 }
@@ -105,11 +115,15 @@ export function deleteAccount() {
 
 export function fetchSubscriptions({ includePlans = false } = {}) {
   const qs = includePlans ? '?include_plans=1' : '';
-  return request(`/subscriptions${qs}`);
+  return optionalAuthRequest(`/subscriptions${qs}`);
 }
 
 export function fetchSubscriptionDetail(slug) {
-  return request(`/subscriptions/${slug}`);
+  return optionalAuthRequest(`/subscriptions/${slug}`);
+}
+
+export function fetchPublicSettings() {
+  return request('/public-settings');
 }
 
 export function fetchUserSubscriptions() {
@@ -159,6 +173,17 @@ export function adminPatchUser(userId, body) {
 export function adminSetUserSubscription(userId, body) {
   return authRequest(`/admin/users/${userId}/subscription`, {
     method: 'PUT',
+    body: JSON.stringify(body),
+  });
+}
+
+export function fetchAdminSettings() {
+  return authRequest('/admin/settings');
+}
+
+export function adminPatchSettings(body) {
+  return authRequest('/admin/settings', {
+    method: 'PATCH',
     body: JSON.stringify(body),
   });
 }

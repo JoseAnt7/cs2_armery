@@ -63,6 +63,53 @@
   color: var(--text-muted);
 }
 
+.admin-visibility-table td[data-label='Visible al público'] {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.admin-visibility-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  font-size: 1.1rem;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.admin-visibility-toggle--on {
+  border-color: rgba(61, 214, 140, 0.45);
+  background: rgba(61, 214, 140, 0.1);
+}
+
+.admin-visibility-toggle--off {
+  border-color: rgba(255, 92, 92, 0.35);
+  background: rgba(255, 92, 92, 0.08);
+}
+
+.admin-visibility-status {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.admin-visibility-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.admin-visibility-msg {
+  font-size: 0.85rem;
+  color: var(--success);
+}
+
 .admin-stats__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { fetchProfile } from '../api/client';
+import { useSiteConfig } from '../context/SiteConfigContext';
 import '../styles/layout.css';
 import '../styles/auth.css';
 
@@ -17,6 +18,10 @@ function getStoredUser() {
 }
 
 function SiteNavLinks({ user, onClose, onLogout }) {
+  const { settings } = useSiteConfig();
+  const hideSubsPublic = Boolean(settings?.hide_subscriptions_public);
+  const canSeeSubs = !hideSubsPublic || Boolean(user?.is_admin);
+
   return (
     <>
       <NavLink
@@ -27,13 +32,15 @@ function SiteNavLinks({ user, onClose, onLogout }) {
       >
         Catálogo
       </NavLink>
-      <NavLink
-        to="/suscripciones"
-        className={({ isActive }) => `nav-link ${isActive ? 'nav-link--active' : ''}`}
-        onClick={onClose}
-      >
-        Suscripciones
-      </NavLink>
+      {canSeeSubs && (
+        <NavLink
+          to="/suscripciones"
+          className={({ isActive }) => `nav-link ${isActive ? 'nav-link--active' : ''}`}
+          onClick={onClose}
+        >
+          Suscripciones
+        </NavLink>
+      )}
       {user ? (
         <>
           {user?.is_admin && (

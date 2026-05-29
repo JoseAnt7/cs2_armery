@@ -156,3 +156,28 @@ class CSBotSettings(db.Model):
             'settings': self.get_settings(),
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
         }
+
+
+class SiteSettings(db.Model):
+    """Ajustes globales de la aplicación (feature flags)."""
+    __tablename__ = 'site_settings'
+
+    id = db.Column(db.Integer, primary_key=True)
+    hide_subscriptions_public = db.Column(db.Boolean, default=False, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    @staticmethod
+    def get_singleton():
+        row = db.session.get(SiteSettings, 1)
+        if row:
+            return row
+        row = SiteSettings(id=1, hide_subscriptions_public=False)
+        db.session.add(row)
+        db.session.commit()
+        return row
+
+    def to_public_dict(self):
+        return {
+            'hide_subscriptions_public': bool(self.hide_subscriptions_public),
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+        }
