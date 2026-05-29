@@ -49,6 +49,8 @@ def create_app():
 
     app.register_blueprint(visits_bp)
     app.register_blueprint(admin_bp)
+    from routes_contact import contact_bp
+    app.register_blueprint(contact_bp)
 
     return app
 

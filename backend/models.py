@@ -158,6 +158,19 @@ class CSBotSettings(db.Model):
         }
 
 
+class ContactMessage(db.Model):
+    """Mensajes del formulario de contacto."""
+    __tablename__ = 'contact_messages'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(200), nullable=False)
+    topic = db.Column(db.String(40), nullable=False, default='general')
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    is_read = db.Column(db.Boolean, default=False, nullable=False)
+
+
 class SiteSettings(db.Model):
     """Ajustes globales de la aplicación (feature flags)."""
     __tablename__ = 'site_settings'

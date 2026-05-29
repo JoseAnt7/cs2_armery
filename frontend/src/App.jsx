@@ -12,9 +12,16 @@ import { Profile } from './Pages/Profile';
 import { Subscriptions } from './Pages/Subscriptions';
 import { SubscriptionDetail } from './Pages/SubscriptionDetail';
 import { Admin } from './Pages/Admin';
+import { LegalNotice } from './Pages/legal/LegalNotice';
+import { Privacy } from './Pages/legal/Privacy';
+import { Cookies } from './Pages/legal/Cookies';
+import { Terms } from './Pages/legal/Terms';
+import { Contact } from './Pages/legal/Contact';
 import { VisitTracker } from './components/VisitTracker';
+import { CookieConsent } from './components/CookieConsent';
 import './styles/layout.css';
 import './styles/mobile.css';
+import './styles/legal.css';
 
 function getStoredUser() {
   try {
@@ -69,9 +76,15 @@ function App() {
                   }
                 />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/aviso-legal" element={<LegalNotice />} />
+                <Route path="/privacidad" element={<Privacy />} />
+                <Route path="/cookies" element={<Cookies />} />
+                <Route path="/terminos" element={<Terms />} />
+                <Route path="/contacto" element={<Contact />} />
               </Routes>
             </main>
             <Footer />
+            <CookieConsent />
             <CSBotWidget />
           </div>
         </SiteConfigProvider>

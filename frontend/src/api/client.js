@@ -140,6 +140,14 @@ export function subscribeToPlan({ subscriptionSlug, planSlug }) {
   });
 }
 
+export function submitContact({ name, email, topic, message }) {
+  return request('/contact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, topic, message }),
+  });
+}
+
 export function trackVisit(path = '/') {
   return request('/visits', {
     method: 'POST',
