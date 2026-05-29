@@ -1,8 +1,8 @@
 /** Datos del titular para textos legales (actualizar cuando cambien). */
 export const LEGAL = {
-  siteName: 'SkinAtlas',
-  domain: 'skinatlas.es',
-  url: 'https://skinatlas.es',
+  siteName: 'Global Skin Metrics',
+  domain: 'globalskinmetrics.com',
+  url: 'https://globalskinmetrics.com',
   description: 'comparador de precios de skins de Counter-Strike 2 (CS2)',
   language: 'español',
   lastUpdated: '29 de mayo de 2026',

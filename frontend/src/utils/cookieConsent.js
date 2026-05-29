@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'skinatlas_cookie_consent';
+const STORAGE_KEY = 'gsm_cookie_consent';
 
 export const DEFAULT_CONSENT = {
   necessary: true,

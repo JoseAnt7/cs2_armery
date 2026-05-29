@@ -28,7 +28,7 @@ export function Subscriptions() {
       <div className="home-page__content">
       <section className="hero">
         <h1 className="hero__title">
-          Suscripciones <span>Skin Atlas</span>
+          Suscripciones <span>Global Skin Metrics</span>
         </h1>
         <p className="hero__subtitle">
           Herramientas premium para traders: alertas de precio, bots inteligentes y mucho más.

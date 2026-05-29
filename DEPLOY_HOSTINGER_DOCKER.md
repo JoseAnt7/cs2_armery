@@ -1,10 +1,10 @@
-# Despliegue en VPS (Hostinger) — SkinAtlas con Docker
+# Despliegue en VPS (Hostinger) — Global Skin Metrics con Docker
 
 Misma estructura que el proyecto **Agentes/VibeUp**: MySQL + backend Flask (Gunicorn) + frontend React (Nginx).
 
 ## Puertos (sin conflicto con VibeUp)
 
-| Servicio | VibeUp (Agentes) | SkinAtlas (este repo) |
+| Servicio | VibeUp (Agentes) | Global Skin Metrics (este repo) |
 |----------|------------------|------------------------|
 | Web HTTP | `80` | **`8081`** (configurable con `HTTP_PORT`) |
 | Backend  | solo red Docker  | solo red Docker (`5000`) |
@@ -39,7 +39,7 @@ El volumen MySQL **no se borra** con ese comando.
 ## 2) Primera vez en el VPS
 
 ```bash
-cd /ruta/al/repo   # ej. /root/SkinAtlas
+cd /ruta/al/repo   # ej. /root/GlobalSkinMetrics
 git clone <tu-repo-github> .
 cp .env.example .env
 cp backend/.env.example backend/.env
@@ -99,7 +99,7 @@ Secretos en GitHub → Settings → Secrets → Actions:
 | `VPS_HOST` | IP o dominio del VPS |
 | `VPS_USER` | Usuario SSH |
 | `VPS_SSH_PRIVATE_KEY` | Clave privada SSH |
-| `VPS_DEPLOY_PATH` | Ruta del repo en el VPS (ej. `/root/SkinAtlas`) |
+| `VPS_DEPLOY_PATH` | Ruta del repo en el VPS (ej. `/root/GlobalSkinMetrics`) |
 | `VPS_SSH_KEY_PASSPHRASE` | Opcional, si la clave tiene passphrase |
 
 Se dispara con push a `main` o `docker`.
@@ -108,7 +108,11 @@ Se dispara con push a `main` o `docker`.
 
 ## 6) HTTPS y dominio
 
-Opciones habituales:
+Producción: **https://globalskinmetrics.com** (y `www.globalskinmetrics.com`).
+
+Traefik en el VPS enruta el dominio al contenedor `frontend` (labels en `docker-compose.yml`). Apunta los registros **A** de `globalskinmetrics.com` y `www` a la IP del VPS.
+
+Alternativas:
 
 - Nginx en el **host** que escuche en 443 y haga proxy a `127.0.0.1:8081`.
 - Cloudflare delante del VPS.

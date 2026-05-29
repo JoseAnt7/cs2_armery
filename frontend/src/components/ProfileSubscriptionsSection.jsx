@@ -35,7 +35,7 @@ export function ProfileSubscriptionsSection() {
   return (
     <section>
       <h2 className="profile-section__title">Subscripciones</h2>
-      <p className="profile-section__desc">Tus planes activos en SkinAtlas</p>
+      <p className="profile-section__desc">Tus planes activos en Global Skin Metrics</p>
 
       {loading && <p className="profile-section__desc">Cargando…</p>}
 

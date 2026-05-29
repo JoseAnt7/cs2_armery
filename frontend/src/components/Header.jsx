@@ -178,7 +178,7 @@ export function Header() {
           <Link to="/" className="brand" onClick={closeMenu}>
             <div className="brand__logo">A</div>
             <div className="brand__text">
-              <span className="brand__name">SkinAtlas</span>
+              <span className="brand__name">Global Skin Metrics</span>
               <span className="brand__tagline">Comparador de precios</span>
             </div>
           </Link>

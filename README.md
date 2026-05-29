@@ -1,4 +1,4 @@
-# SkinAtlas
+# Global Skin Metrics
 
 Comparador de precios de skins y armas de **Counter-Strike 2**. Lista el catálogo por categorías, busca skins y al abrir una ficha muestra el **precio promedio** entre varios mercados y los **5 sitios más baratos**.
 

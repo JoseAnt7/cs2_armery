@@ -57,7 +57,7 @@ export function LegalNotice() {
         Los contenidos propios del sitio (diseño, textos y código) pertenecen a los titulares
         salvo indicación contraria. Las marcas, nombres comerciales y signos distintivos de
         terceros (incluidos Valve, Steam y Counter-Strike) son propiedad de sus respectivos
-        titulares. Las {LEGAL.imageSources}. SkinAtlas no reclama propiedad sobre dichos
+        titulares. Las {LEGAL.imageSources}. {LEGAL.siteName} no reclama propiedad sobre dichos
         materiales de terceros.
       </p>
 
