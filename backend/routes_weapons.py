@@ -1,11 +1,22 @@
 """
 Rutas de la API para el comparador de precios de armas CS2.
 """
+import os
+
 from flask import Blueprint, jsonify, request
 
-from services import catalog, price_aggregator
+from services import cache, catalog, price_aggregator
 
 weapons_bp = Blueprint("weapons", __name__)
+
+LIST_CACHE_TTL = int(os.environ.get("LIST_RESPONSE_TTL_SECONDS", str(45 * 60)))
+
+
+def _list_cache_key(category, query, exterior, rarity, page, limit, sort, include_prices):
+    return (
+        f"weapons_list:{category}:{query}:{exterior}:{rarity}:"
+        f"{page}:{limit}:{sort}:{'1' if include_prices else '0'}"
+    )
 
 
 @weapons_bp.route("/api/weapons/categories", methods=["GET"])
@@ -29,6 +40,14 @@ def list_weapons():
     sort = request.args.get("sort", "name")
     include_prices = request.args.get("prices", "0") == "1"
 
+    cache_key = _list_cache_key(
+        category, query, exterior, rarity, page, limit, sort, include_prices
+    )
+    if include_prices:
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return jsonify(cached)
+
     result = catalog.search_weapons(
         category=category,
         query=query,
@@ -41,6 +60,7 @@ def list_weapons():
 
     if include_prices:
         result["items"] = price_aggregator.enrich_list_with_prices(result["items"])
+        cache.set(cache_key, result, ttl_seconds=LIST_CACHE_TTL, persist=True)
 
     return jsonify(result)
 
@@ -63,4 +83,20 @@ def weapon_detail(weapon_id):
 
 @weapons_bp.route("/api/health", methods=["GET"])
 def health():
-    return jsonify({"status": "ok", "app": "Global Skin Metrics"})
+    from services.refresh_jobs import META_FILE
+
+    meta = {}
+    if META_FILE.exists():
+        try:
+            import json
+
+            with open(META_FILE, encoding="utf-8") as f:
+                meta = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            pass
+
+    return jsonify({
+        "status": "ok",
+        "app": "Global Skin Metrics",
+        "cache_refresh": meta,
+    })
