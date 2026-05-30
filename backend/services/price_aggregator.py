@@ -1,6 +1,7 @@
 """
 Agrega precios reales de varios mercados y devuelve el promedio y los 5 más baratos.
 """
+import os
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -27,6 +28,10 @@ HEADERS_BR = {
     "Accept": "application/json",
     "User-Agent": "CS2Armery/1.0 (price-comparison; educational)",
 }
+
+# TTLs (segundos): índices masivos 4 h, detalle 10 min
+INDEX_TTL = int(os.environ.get("PRICE_INDEX_TTL_SECONDS", str(4 * 3600)))
+DETAIL_PRICE_TTL = int(os.environ.get("DETAIL_PRICE_TTL_SECONDS", str(10 * 60)))
 
 
 def _parse_steam_price(text):
@@ -76,18 +81,14 @@ def fetch_steam_price(market_hash_name):
             "available": price is not None,
             "note": "Precio más bajo en Steam",
         }
-        cache.set(cache_key, result, ttl_seconds=300)
+        cache.set(cache_key, result, ttl_seconds=DETAIL_PRICE_TTL)
         return result
     except Exception:
         cache.set(cache_key, None, ttl_seconds=60)
         return None
 
 
-def _load_skinport_index():
-    cached = cache.get("skinport_index")
-    if cached:
-        return cached
-
+def _fetch_skinport_index_from_api():
     response = requests.get(
         SKINPORT_ITEMS_URL,
         params={"app_id": 730, "currency": "USD", "tradable": 0},
@@ -107,8 +108,17 @@ def _load_skinport_index():
             "price_usd": round(float(min_price), 2),
             "url": item.get("item_page") or skinport_search_url(name),
         }
-    cache.set("skinport_index", index, ttl_seconds=600)
+    cache.set("skinport_index", index, ttl_seconds=INDEX_TTL, persist=True)
     return index
+
+
+def _load_skinport_index(force=False):
+    if not force:
+        cached = cache.get("skinport_index")
+        if cached:
+            return cached
+
+    return _fetch_skinport_index_from_api()
 
 
 def fetch_skinport_price(market_hash_name):
@@ -128,11 +138,7 @@ def fetch_skinport_price(market_hash_name):
         return None
 
 
-def _load_waxpeer_index():
-    cached = cache.get("waxpeer_index")
-    if cached:
-        return cached
-
+def _fetch_waxpeer_index_from_api():
     response = requests.get(
         WAXPEER_PRICES_URL,
         params={"game": "csgo"},
@@ -146,8 +152,22 @@ def _load_waxpeer_index():
         min_val = item.get("min")
         if name and min_val:
             index[name] = round(float(min_val) / 1000, 2)
-    cache.set("waxpeer_index", index, ttl_seconds=600)
+    cache.set("waxpeer_index", index, ttl_seconds=INDEX_TTL, persist=True)
     return index
+
+
+def _load_waxpeer_index(force=False):
+    if not force:
+        cached = cache.get("waxpeer_index")
+        if cached:
+            return cached
+    return _fetch_waxpeer_index_from_api()
+
+
+def refresh_market_indexes(force=False):
+    """Precarga o renueva índices masivos Skinport + Waxpeer."""
+    _load_skinport_index(force=force)
+    _load_waxpeer_index(force=force)
 
 
 def fetch_waxpeer_price(market_hash_name):
@@ -209,7 +229,7 @@ def fetch_dmarket_price(market_hash_name):
             "available": True,
             "note": "Mejor listing activo",
         }
-        cache.set(cache_key, result, ttl_seconds=300)
+        cache.set(cache_key, result, ttl_seconds=DETAIL_PRICE_TTL)
         return result
     except Exception:
         cache.set(cache_key, None, ttl_seconds=60)
@@ -236,7 +256,7 @@ def fetch_csfloat_price(market_hash_name):
             headers=HEADERS_BR,
         )
         if response.status_code != 200:
-            cache.set(cache_key, None, ttl_seconds=300)
+            cache.set(cache_key, None, ttl_seconds=DETAIL_PRICE_TTL)
             return None
 
         listings = response.json() or []
@@ -247,7 +267,7 @@ def fetch_csfloat_price(market_hash_name):
                 prices.append(round(int(cents) / 100, 2))
 
         if not prices:
-            cache.set(cache_key, None, ttl_seconds=300)
+            cache.set(cache_key, None, ttl_seconds=DETAIL_PRICE_TTL)
             return None
 
         result = {
@@ -257,7 +277,7 @@ def fetch_csfloat_price(market_hash_name):
             "available": True,
             "note": "Listing más barato",
         }
-        cache.set(cache_key, result, ttl_seconds=300)
+        cache.set(cache_key, result, ttl_seconds=DETAIL_PRICE_TTL)
         return result
     except Exception:
         cache.set(cache_key, None, ttl_seconds=120)

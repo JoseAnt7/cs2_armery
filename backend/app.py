@@ -1,4 +1,6 @@
+import logging
 import os
+import threading
 from datetime import timedelta
 
 from flask import Flask
@@ -8,10 +10,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO"))
+
 
 def create_app():
     app = Flask(__name__)
-    # Configuration
     database_url = os.environ.get('DATABASE_URL')
     if database_url:
         app.config['SQLALCHEMY_DATABASE_URI'] = database_url
@@ -52,21 +55,28 @@ def create_app():
     from routes_contact import contact_bp
     app.register_blueprint(contact_bp)
 
+    _start_background_services(app)
+
     return app
 
-def _warm_caches():
-    try:
-        from services import catalog, price_aggregator
 
-        catalog.load_catalog()
-        price_aggregator._load_waxpeer_index()
-    except Exception:
-        pass
+def _start_background_services(app):
+    """Precarga cachés y arranca el scheduler (una vez por proceso)."""
+    if getattr(app, "_background_started", False):
+        return
+    app._background_started = True
+
+    def bootstrap():
+        with app.app_context():
+            from services.refresh_jobs import warm_caches_on_startup
+            from services.scheduler import init_scheduler
+
+            warm_caches_on_startup()
+            init_scheduler(app)
+
+    threading.Thread(target=bootstrap, daemon=True).start()
 
 
 if __name__ == '__main__':
-    import threading
-
     app = create_app()
-    threading.Thread(target=_warm_caches, daemon=True).start()
     app.run(host='0.0.0.0', port=5000, debug=True)
