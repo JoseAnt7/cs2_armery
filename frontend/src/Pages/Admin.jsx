@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import {
   adminCreateUser,
@@ -11,7 +11,23 @@ import {
   fetchSubscriptions,
 } from '../api/client';
 import { useSiteConfig } from '../context/SiteConfigContext';
+import { applyColorTheme, resolveColorTheme } from '../utils/applyColorTheme';
 import '../styles/admin.css';
+
+const COLOR_THEME_OPTIONS = [
+  {
+    id: 'orange',
+    label: 'Naranja / dorado',
+    description: 'Tema actual. Cálido y energético, ideal para destacar ofertas.',
+    swatch: ['#f5a623', '#e67e22'],
+  },
+  {
+    id: 'blue',
+    label: 'Azul',
+    description: 'Alineado con el logo. Enfocado en datos y métricas.',
+    swatch: ['#4d9fff', '#2563eb'],
+  },
+];
 
 const PUBLIC_PAGES = [
   {
@@ -45,8 +61,10 @@ export function Admin() {
   const [siteSettings, setSiteSettings] = useState(null);
   const [draftHideSubs, setDraftHideSubs] = useState(false);
   const [savedHideSubs, setSavedHideSubs] = useState(false);
-  const [savingVisibility, setSavingVisibility] = useState(false);
-  const [visibilityMsg, setVisibilityMsg] = useState('');
+  const [draftTheme, setDraftTheme] = useState('orange');
+  const [savedTheme, setSavedTheme] = useState('orange');
+  const [savingSiteSettings, setSavingSiteSettings] = useState(false);
+  const [siteSettingsMsg, setSiteSettingsMsg] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [newUser, setNewUser] = useState({
@@ -56,6 +74,8 @@ export function Admin() {
     is_admin: false,
   });
   const [subEdit, setSubEdit] = useState({});
+  const savedThemeRef = useRef('orange');
+  savedThemeRef.current = savedTheme;
 
   const sortedUsers = useMemo(
     () => [...users].sort((a, b) => a.id - b.id),
@@ -78,8 +98,12 @@ export function Admin() {
       const settings = settingsRes.settings || null;
       setSiteSettings(settings);
       const hideSubs = Boolean(settings?.hide_subscriptions_public);
+      const theme = resolveColorTheme(settings?.color_theme);
       setDraftHideSubs(hideSubs);
       setSavedHideSubs(hideSubs);
+      setDraftTheme(theme);
+      setSavedTheme(theme);
+      applyColorTheme(theme);
       setForbidden(false);
     } catch (err) {
       const msg = String(err.message || '');
@@ -97,6 +121,10 @@ export function Admin() {
     if (!token) return;
     loadAll();
   }, [token, loadAll]);
+
+  useEffect(() => {
+    return () => applyColorTheme(savedThemeRef.current);
+  }, []);
 
   const handleCreateUser = useCallback(
     async (e) => {
@@ -169,6 +197,45 @@ export function Admin() {
     [subEdit, sortedUsers, subsCatalog, planOptionsForSub, loadAll],
   );
 
+  const siteSettingsDirty =
+    draftHideSubs !== savedHideSubs || draftTheme !== savedTheme;
+
+  function selectDraftTheme(themeId) {
+    setSiteSettingsMsg('');
+    const next = resolveColorTheme(themeId);
+    setDraftTheme(next);
+    applyColorTheme(next);
+  }
+
+  async function saveSiteSettings() {
+    setError('');
+    setSiteSettingsMsg('');
+    setSavingSiteSettings(true);
+    try {
+      const res = await adminPatchSettings({
+        hide_subscriptions_public: draftHideSubs,
+        color_theme: draftTheme,
+      });
+      const settings = res.settings || null;
+      const nextHide = Boolean(settings?.hide_subscriptions_public);
+      const nextTheme = resolveColorTheme(settings?.color_theme);
+      setSiteSettings(settings);
+      setDraftHideSubs(nextHide);
+      setSavedHideSubs(nextHide);
+      setDraftTheme(nextTheme);
+      setSavedTheme(nextTheme);
+      applyColorTheme(nextTheme);
+      await refreshSiteConfig();
+      setSiteSettingsMsg('Cambios guardados');
+    } catch (err) {
+      setError(err.message);
+      applyColorTheme(savedTheme);
+      setDraftTheme(savedTheme);
+    } finally {
+      setSavingSiteSettings(false);
+    }
+  }
+
   if (!token) {
     return <Navigate to="/cuenta" replace state={{ from: '/admin' }} />;
   }
@@ -185,27 +252,6 @@ export function Admin() {
     return <Navigate to="/" replace />;
   }
 
-  const visibilityDirty = draftHideSubs !== savedHideSubs;
-
-  async function saveVisibility() {
-    setError('');
-    setVisibilityMsg('');
-    setSavingVisibility(true);
-    try {
-      const res = await adminPatchSettings({ hide_subscriptions_public: draftHideSubs });
-      const next = Boolean(res.settings?.hide_subscriptions_public);
-      setSiteSettings(res.settings || null);
-      setDraftHideSubs(next);
-      setSavedHideSubs(next);
-      await refreshSiteConfig();
-      setVisibilityMsg('Cambios guardados');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setSavingVisibility(false);
-    }
-  }
-
   return (
     <div className="admin-page">
       <header className="admin-page__header">
@@ -216,6 +262,42 @@ export function Admin() {
       </header>
 
       {error && <p className="admin-error">{error}</p>}
+
+      <section className="admin-section">
+        <h2 className="admin-section-title">Apariencia del sitio</h2>
+        <p className="admin-note">
+          Elige la paleta de acento (home, botones, enlaces activos, etc.). La vista previa se aplica al instante;
+          pulsa Guardar para que todos los visitantes la vean.
+        </p>
+        <div className="admin-theme-grid" role="radiogroup" aria-label="Tema de color">
+          {COLOR_THEME_OPTIONS.map((opt) => {
+            const selected = draftTheme === opt.id;
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                className={`admin-theme-card ${selected ? 'admin-theme-card--active' : ''}`}
+                onClick={() => selectDraftTheme(opt.id)}
+              >
+                <span className="admin-theme-card__swatches" aria-hidden>
+                  {opt.swatch.map((color) => (
+                    <span key={color} style={{ background: color }} />
+                  ))}
+                </span>
+                <span className="admin-theme-card__label">{opt.label}</span>
+                <span className="admin-theme-card__desc">{opt.description}</span>
+                {selected && <span className="admin-theme-card__badge">Seleccionado</span>}
+              </button>
+            );
+          })}
+        </div>
+        <p className="admin-theme-preview">
+          Vista previa:{' '}
+          <span className="admin-theme-preview__accent">skins CS2</span> en el título de la home.
+        </p>
+      </section>
 
       <section className="admin-section">
         <h2 className="admin-section-title">Visibilidad de páginas</h2>
@@ -245,7 +327,7 @@ export function Admin() {
                         type="button"
                         className={`admin-visibility-toggle ${isPublicVisible ? 'admin-visibility-toggle--on' : 'admin-visibility-toggle--off'}`}
                         onClick={() => {
-                          setVisibilityMsg('');
+                          setSiteSettingsMsg('');
                           setDraftHideSubs((prev) => !prev);
                         }}
                         title={isPublicVisible ? 'Visible para el público' : 'Oculta para el público'}
@@ -271,13 +353,13 @@ export function Admin() {
           <button
             type="button"
             className="admin-btn"
-            disabled={!visibilityDirty || savingVisibility}
-            onClick={saveVisibility}
+            disabled={!siteSettingsDirty || savingSiteSettings}
+            onClick={saveSiteSettings}
           >
-            {savingVisibility ? 'Guardando…' : 'Guardar cambios'}
+            {savingSiteSettings ? 'Guardando…' : 'Guardar cambios'}
           </button>
-          {visibilityMsg && (
-            <span className="admin-visibility-msg">{visibilityMsg}</span>
+          {siteSettingsMsg && (
+            <span className="admin-visibility-msg">{siteSettingsMsg}</span>
           )}
         </div>
       </section>

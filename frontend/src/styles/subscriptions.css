@@ -16,7 +16,7 @@
 
 .subscription-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(245, 166, 35, 0.35);
+  border-color: rgba(var(--accent-rgb), 0.35);
   box-shadow: var(--shadow);
 }
 
@@ -39,7 +39,7 @@
   left: 0.75rem;
   padding: 0.25rem 0.6rem;
   border-radius: 999px;
-  background: rgba(245, 166, 35, 0.9);
+  background: rgba(var(--accent-rgb), 0.9);
   color: #0a0c10;
   font-size: 0.72rem;
   font-weight: 700;
@@ -175,13 +175,13 @@
 }
 
 .plan-card:hover {
-  border-color: rgba(245, 166, 35, 0.3);
+  border-color: rgba(var(--accent-rgb), 0.3);
   transform: translateY(-2px);
 }
 
 .plan-card--featured {
-  border-color: rgba(245, 166, 35, 0.45);
-  background: rgba(245, 166, 35, 0.06);
+  border-color: rgba(var(--accent-rgb), 0.45);
+  background: rgba(var(--accent-rgb), 0.06);
   box-shadow: 0 0 24px var(--accent-glow);
 }
 
@@ -231,7 +231,7 @@
   padding: 0.7rem 1rem;
   border: none;
   border-radius: var(--radius-sm);
-  background: linear-gradient(135deg, var(--accent), #e67e22);
+  background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
   color: #0a0c10;
   font-weight: 700;
   font-size: 0.9rem;

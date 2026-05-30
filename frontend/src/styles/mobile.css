@@ -32,18 +32,9 @@
     gap: 0.5rem;
   }
 
-  .brand__tagline {
-    display: none;
-  }
-
-  .brand__name {
-    font-size: 1.15rem;
-  }
-
-  .brand__logo {
-    width: 36px;
+  .brand__img {
     height: 36px;
-    font-size: 1rem;
+    max-width: min(220px, 48vw);
   }
 
   .nav-toggle {
@@ -133,8 +124,8 @@
   }
 
   .site-nav .nav-link--active {
-    background: rgba(245, 166, 35, 0.1);
-    border-color: rgba(245, 166, 35, 0.35);
+    background: rgba(var(--accent-rgb), 0.1);
+    border-color: rgba(var(--accent-rgb), 0.35);
   }
 
   .site-nav .nav-user {
@@ -339,7 +330,7 @@
   .profile-nav__btn--active {
     box-shadow: none;
     border: 1px solid var(--accent);
-    background: rgba(245, 166, 35, 0.12);
+    background: rgba(var(--accent-rgb), 0.12);
   }
 
   .profile-nav__lock {

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { fetchProfile } from '../api/client';
 import { useSiteConfig } from '../context/SiteConfigContext';
+import navbarLogo from '../assets/img/navbar-logo.png';
 import '../styles/layout.css';
 import '../styles/auth.css';
 
@@ -176,11 +177,14 @@ export function Header() {
       >
         <div className="site-header__inner">
           <Link to="/" className="brand" onClick={closeMenu}>
-            <div className="brand__logo">A</div>
-            <div className="brand__text">
-              <span className="brand__name">Global Skin Metrics</span>
-              <span className="brand__tagline">Comparador de precios</span>
-            </div>
+            <img
+              src={navbarLogo}
+              alt="Global Skin Metrics — Comparador de precios"
+              className="brand__img"
+              width={280}
+              height={48}
+              decoding="async"
+            />
           </Link>
 
           {isMobile && (

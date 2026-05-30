@@ -33,6 +33,23 @@ def run_migrations():
                 except Exception:
                     pass
 
+    if "site_settings" in inspector.get_table_names():
+        cols = {c["name"] for c in inspector.get_columns("site_settings")}
+        if "color_theme" not in cols:
+            dialect = engine.dialect.name
+            if dialect == "sqlite":
+                stmt = text(
+                    "ALTER TABLE site_settings ADD COLUMN color_theme VARCHAR(20) "
+                    "NOT NULL DEFAULT 'orange'"
+                )
+            else:
+                stmt = text(
+                    "ALTER TABLE site_settings ADD COLUMN color_theme VARCHAR(20) "
+                    "NOT NULL DEFAULT 'orange'"
+                )
+            with engine.begin() as conn:
+                conn.execute(stmt)
+
     db.session.expire_all()
     try:
         User.query.filter(User.is_admin.is_(None)).update(

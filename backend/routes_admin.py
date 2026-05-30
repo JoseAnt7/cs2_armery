@@ -7,7 +7,15 @@ from werkzeug.security import generate_password_hash
 from sqlalchemy import func
 
 from extensions import db
-from models import User, UserSubscription, Subscription, SubscriptionPlan, PageVisit, SiteSettings
+from models import (
+    User,
+    UserSubscription,
+    Subscription,
+    SubscriptionPlan,
+    PageVisit,
+    SiteSettings,
+    VALID_COLOR_THEMES,
+)
 
 admin_bp = Blueprint("admin", __name__)
 
@@ -289,6 +297,12 @@ def admin_patch_settings():
 
     if "hide_subscriptions_public" in data:
         row.hide_subscriptions_public = bool(data["hide_subscriptions_public"])
+
+    if "color_theme" in data:
+        theme = str(data["color_theme"]).strip().lower()
+        if theme not in VALID_COLOR_THEMES:
+            return jsonify({"msg": "Tema no válido (orange o blue)"}), 400
+        row.color_theme = theme
 
     db.session.commit()
     return jsonify({"settings": row.to_public_dict()})

@@ -159,7 +159,7 @@
 
 .weapon-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(245, 166, 35, 0.35);
+  border-color: rgba(var(--accent-rgb), 0.35);
   box-shadow: var(--shadow);
   background: var(--bg-card-hover);
 }
