@@ -20,42 +20,17 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
-.brand__logo {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent), #e67e22);
-  display: grid;
-  place-items: center;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: #0a0c10;
-  box-shadow: 0 0 20px var(--accent-glow);
-}
-
-.brand__text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
-}
-
-.brand__name {
-  font-family: var(--font-display);
-  font-size: 1.35rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.brand__tagline {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.brand__img {
+  display: block;
+  height: 44px;
+  width: auto;
+  max-width: min(280px, 52vw);
+  object-fit: contain;
+  object-position: left center;
 }
 
 .site-footer {

@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { fetchPublicSettings } from '../api/client';
+import { applyColorTheme } from '../utils/applyColorTheme';
 
 const SiteConfigContext = createContext({
   settings: null,
@@ -17,6 +18,10 @@ export function SiteConfigProvider({ children }) {
   useEffect(() => {
     refresh().catch(() => {});
   }, [refresh]);
+
+  useEffect(() => {
+    applyColorTheme(settings?.color_theme);
+  }, [settings?.color_theme]);
 
   const value = useMemo(() => ({ settings, refresh }), [settings, refresh]);
 

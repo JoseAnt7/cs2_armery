@@ -6,7 +6,7 @@
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  border: 2px solid rgba(245, 166, 35, 0.5);
+  border: 2px solid rgba(var(--accent-rgb), 0.5);
   background: linear-gradient(145deg, #1a1f2e, #12151c);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 0 20px var(--accent-glow);
   cursor: pointer;
@@ -253,7 +253,7 @@
 .csbot-mode-tab--active {
   border-color: var(--accent);
   color: var(--accent);
-  background: rgba(245, 166, 35, 0.1);
+  background: rgba(var(--accent-rgb), 0.1);
 }
 
 .csbot-chips {
@@ -325,8 +325,8 @@
   gap: 0.35rem;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
-  background: rgba(245, 166, 35, 0.12);
-  border: 1px solid rgba(245, 166, 35, 0.25);
+  background: rgba(var(--accent-rgb), 0.12);
+  border: 1px solid rgba(var(--accent-rgb), 0.25);
   font-size: 0.72rem;
   max-width: 100%;
 }
@@ -353,7 +353,7 @@
   padding: 0.8rem 1rem;
   border: none;
   border-radius: var(--radius-sm);
-  background: linear-gradient(135deg, var(--accent), #e67e22);
+  background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
   color: #0a0c10;
   font-weight: 700;
   font-size: 1rem;

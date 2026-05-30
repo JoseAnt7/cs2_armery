@@ -178,12 +178,16 @@ class ContactMessage(db.Model):
     is_read = db.Column(db.Boolean, default=False, nullable=False)
 
 
+VALID_COLOR_THEMES = frozenset({'orange', 'blue'})
+
+
 class SiteSettings(db.Model):
     """Ajustes globales de la aplicación (feature flags)."""
     __tablename__ = 'site_settings'
 
     id = db.Column(db.Integer, primary_key=True)
     hide_subscriptions_public = db.Column(db.Boolean, default=False, nullable=False)
+    color_theme = db.Column(db.String(20), default='orange', nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     @staticmethod
@@ -191,13 +195,18 @@ class SiteSettings(db.Model):
         row = db.session.get(SiteSettings, 1)
         if row:
             return row
-        row = SiteSettings(id=1, hide_subscriptions_public=False)
+        row = SiteSettings(id=1, hide_subscriptions_public=False, color_theme='orange')
         db.session.add(row)
         db.session.commit()
         return row
 
+    def resolved_color_theme(self):
+        theme = (self.color_theme or 'orange').strip().lower()
+        return theme if theme in VALID_COLOR_THEMES else 'orange'
+
     def to_public_dict(self):
         return {
             'hide_subscriptions_public': bool(self.hide_subscriptions_public),
+            'color_theme': self.resolved_color_theme(),
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
         }

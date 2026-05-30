@@ -73,7 +73,7 @@
 
 .profile-nav__btn--active {
   color: var(--accent);
-  background: rgba(245, 166, 35, 0.08);
+  background: rgba(var(--accent-rgb), 0.08);
   font-weight: 600;
   box-shadow: inset 3px 0 0 var(--accent);
 }
@@ -161,8 +161,8 @@
 }
 
 .profile-placeholder--locked {
-  border-color: rgba(245, 166, 35, 0.25);
-  background: rgba(245, 166, 35, 0.04);
+  border-color: rgba(var(--accent-rgb), 0.25);
+  background: rgba(var(--accent-rgb), 0.04);
 }
 
 .profile-placeholder__icon {

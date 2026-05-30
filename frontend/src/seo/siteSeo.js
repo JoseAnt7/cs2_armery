@@ -18,7 +18,7 @@ export const SITE_SEO = {
 
 const PUBLIC_ROUTES = {
   '/': {
-    title: 'Comparador de precios de skins CS2',
+    title: 'Global Skin Metrics | Comparador de precios de skins CS2',
     description: SITE_SEO.defaultDescription,
   },
   '/suscripciones': {
